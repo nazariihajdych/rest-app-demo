@@ -3,6 +3,7 @@ package ua.restapp.demo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ua.restapp.demo.exception.UserNotFoundException;
 import ua.restapp.demo.model.dto.UserDTO;
 import ua.restapp.demo.model.entity.User;
 import ua.restapp.demo.model.mapper.UserMapper;
@@ -11,6 +12,7 @@ import ua.restapp.demo.repo.UserRepo;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -38,23 +40,45 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDTO updateUser(UserDTO userDTO) {
-        return null;
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = findUserOrThrow(id);
+
+        userMapper.updateUserFromDTO(userDTO, user);
+
+        User saved = userRepo.save(user);
+        return userMapper.userToUserDTO(saved);
     }
 
     @Override
     public UserDTO partialUserUpdate(Long id, UserDTO userDTO) {
-        return null;
+        User user = findUserOrThrow(id);
+        userMapper.partlyUpdateUserFromDTO(userDTO, user);
+        User saved = userRepo.save(user);
+        return userMapper.userToUserDTO(saved);
     }
 
     @Override
     public UserDTO deleteUser(Long id) {
-        User deletedUser = userRepo.deleteUserById(id);
-        return userMapper.userToUserDTO(deletedUser);
+        User user = findUserOrThrow(id);
+        userRepo.delete(user);
+        return userMapper.userToUserDTO(user);
     }
 
     @Override
-    public List<UserDTO> getUserByBirthDateRange(Integer from, Integer to) {
-        return null;
+    public List<UserDTO> getUserByBirthDateRange(Date from, Date to) {
+        if (from.after(to)){
+            throw new IllegalArgumentException("'From' date must be before 'To' date");
+        }
+        List<User> byDateOfBirthBetween = userRepo.findByDateOfBirthBetween(from, to);
+
+        return byDateOfBirthBetween.stream()
+                .map(userMapper::userToUserDTO)
+                .toList();
+    }
+
+    private User findUserOrThrow(Long userId) {
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id = " + userId + " not found"));
+
     }
 }
