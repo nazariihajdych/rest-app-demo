@@ -16,9 +16,12 @@ public class UserDTO {
     @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$",
             message = "not valid email")
     private String email;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-mm-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @NotNull
     @Past(message = "should be in past")
     private Date dateOfBirth;
     private String phoneNumber;
