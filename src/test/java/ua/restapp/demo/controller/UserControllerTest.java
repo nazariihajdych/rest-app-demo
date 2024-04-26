@@ -1,12 +1,7 @@
 package ua.restapp.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,11 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,6 +44,7 @@ class UserControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
                 .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
+
     @Test
     @Order(1)
     void createUser_successfully() throws Exception {
@@ -140,7 +132,7 @@ class UserControllerTest {
                         .characterEncoding("utf-8")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jFakeUserDTO))
-                 .andExpect(status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(result -> assertInstanceOf(UserDTO.class,
                         objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class)
                 ))
@@ -153,8 +145,8 @@ class UserControllerTest {
     @Order(5)
     void getUserByBirthDateRange_successful() throws Exception {
         mockMvc.perform(get("/users")
-                .param("from", "1998-01-01")
-                .param("to", "2022-01-01"))
+                        .param("from", "1998-01-01")
+                        .param("to", "2022-01-01"))
                 .andExpect(status().isOk())
                 .andExpect(result -> assertInstanceOf(List.class,
                         objectMapper.readValue(result.getResponse().getContentAsString(), List.class)
